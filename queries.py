@@ -3,7 +3,7 @@ DATABASE_NAME = "taxes.db"
 CREATE_TAX_INFO_TABLE = '''CREATE TABLE IF NOT EXISTS tax_info(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     incoming_date TEXT,
-    income_value INT, 
+    income_value REAL, 
     exchange_rate REAL,
     converted_income_value INT)'''
 
@@ -11,6 +11,7 @@ ADD_TAX_INFO_ROW = '''INSERT INTO tax_info (incoming_date,
 income_value,
 exchange_rate,
 converted_income_value) values (?, ?, ?, ?)
+RETURNING *
 '''
 
 FIND_ALL_TAX_INFO = 'SELECT * FROM tax_info order by date(incoming_date) desc'

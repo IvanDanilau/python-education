@@ -10,9 +10,10 @@ def menu_description():
     return '''
 *****************************     
     We have next commands:
- - AI - get annual income
- - MT - get month tax value
- - exit - exit the program
+ - 'add inc' - add income information
+ - 'annual inc' - get annual income
+ - 'month tax' - get month tax value
+ - 'exit' - exit the program
 *****************************
  '''
 
@@ -26,17 +27,18 @@ if __name__ == '__main__':
     # storage.findAll()
     print(" Greetings!")
     while True:
-        val = input(menu_description())
-
+        val = input(menu_description()).replace(" ", "").lower()
         if val == 'exit':
             print("Have a good day!")
             break
-        if val == 'AI':
+        if val == 'annualinc':
             service.find_annual_income()
             continue
-        if val == 'MT':
+        if val == 'monthtax':
             service.moth_tax_value()
             continue
+        if val == "addinc":
+            service.add_income()
         else:
             print("Unrecognized command. Try again")
 

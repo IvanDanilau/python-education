@@ -7,10 +7,12 @@ from utils import *
 
 class TaxRow:
 
-    def __init__(self, income_value: int, income_date: datetime, exchange_rate: float):
+    def __init__(self, income_value: float, income_date: datetime, exchange_rate: float,
+                 converted_income_value: int = None):
         self.income_value = income_value
         self.income_date = income_date
         self.exchange_rate = exchange_rate
+        self.converted_income_value = converted_income_value
 
     def toTuple(self):
         if self.income_date and self.income_value and self.exchange_rate:
@@ -19,9 +21,17 @@ class TaxRow:
         else:
             raise Exception("invalid row")
 
+    def __str__(self) -> str:
+        return f"""" Tax row info : \n
+- income value in USD {self.income_value} \n
+- income date {self.income_date} \n
+- exchange rate {self.exchange_rate} \n
+- income value in GEL {self.converted_income_value} \n
+           """
+
 
 def tax_info_factory():
-    return lambda cursor, row: TaxRow(row[2], row[1], row[3])
+    return lambda cursor, row: TaxRow(row[2], row[1], row[3], row[4])
 
 
 class TaxInfo:
@@ -49,7 +59,8 @@ class TaxInfo:
 
     @transaction
     def insert_row(self, cursor, value: TaxRow):
-        cursor.execute(ADD_TAX_INFO_ROW, value.toTuple())
+        cursor.row_factory = tax_info_factory()
+        return cursor.execute(ADD_TAX_INFO_ROW, value.toTuple()).fetchone()
 
     @transaction
     def clear_data(self, cursor):
