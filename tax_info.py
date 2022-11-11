@@ -5,33 +5,41 @@ from queries import *
 from utils import *
 
 
-class TaxRow:
+class NewTaxRow:
 
-    def __init__(self, income_value: float, income_date: datetime, exchange_rate: float,
-                 converted_income_value: int = None):
+    def __init__(self, income_value: float, income_date: datetime, exchange_rate: float):
+        self.id = id
         self.income_value = income_value
         self.income_date = income_date
         self.exchange_rate = exchange_rate
-        self.converted_income_value = converted_income_value
 
-    def toTuple(self):
+    def to_tuple(self):
         if self.income_date and self.income_value and self.exchange_rate:
             converted_income_value = round_up(self.income_value * self.exchange_rate)
             return str(self.income_date), self.income_value, self.exchange_rate, converted_income_value
         else:
             raise Exception("invalid row")
 
+
+class TaxRow:
+    def __init__(self, id, income_date, income_value, exchange_rate, converted_income_value):
+        self.id = id
+        self.income_date = income_date
+        self.income_value = income_value
+        self.exchange_rate = exchange_rate
+        self.converted_income_value = converted_income_value
+
     def __str__(self) -> str:
         return f"""" Tax row info : \n
-- income value in USD {self.income_value} \n
-- income date {self.income_date} \n
-- exchange rate {self.exchange_rate} \n
-- income value in GEL {self.converted_income_value} \n
-           """
+    - income value in USD {self.income_value} \n
+    - income date {self.income_date} \n
+    - exchange rate {self.exchange_rate} \n
+    - income value in GEL {self.converted_income_value} \n
+               """
 
 
 def tax_info_factory():
-    return lambda cursor, row: TaxRow(row[2], row[1], row[3], row[4])
+    return lambda cursor, row: TaxRow(row[0], row[1], row[2], row[3], row[4])
 
 
 class TaxInfo:
@@ -45,12 +53,12 @@ class TaxInfo:
         cursor.execute(CREATE_TAX_INFO_TABLE)
 
     @transaction
-    def findAll(self, cursor):
+    def find_all(self, cursor):
         for row in cursor.execute(FIND_ALL_TAX_INFO):
             print(row)
 
     @transaction
-    def findByDate(self, cursor, date: dict):
+    def find_by_date(self, cursor, date: dict):
         year = None if date.get("year") is None else str(date.get('year'))
         month = None if date.get("month") is None else str(date.get('month'))
         day = None if date.get("day") is None else str(date.get('day'))
