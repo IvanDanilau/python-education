@@ -1,8 +1,11 @@
 from datetime import datetime
 
 import centrobank
-from tax_info import TaxInfo, TaxRow
+import data_import
+from tax_info import TaxInfo, NewTaxRow
 from utils import round_up, repeat_on_invalid_input
+
+DEFAULT_SOURCE_PATH = "source.txt"
 
 
 @repeat_on_invalid_input
@@ -13,18 +16,33 @@ def add_income():
         exchange_rate = centrobank.get_exchange_rate(date)
     except:
         exchange_rate = input('Print get info from central bank. Please, enter it manually or change the date \n')
-    new_row = TaxRow(income_value=income_val, income_date=date, exchange_rate=exchange_rate)
+    new_row = NewTaxRow(income_value=income_val, income_date=date, exchange_rate=exchange_rate)
     row = TaxInfo().insert_row(new_row)
     print(f"Tax info added: \n {row}")
 
 
 def find_annual_income():
-    year = int(input("Enter the desired year \n"))
+    current_year = datetime.now().year
+    year = int(input(f"Enter the desired year (def {current_year})\n") or current_year)
+    result = count_income({"year": year})
+    print(f"The annual income for {year}'s year is {result}")
+
+
+def count_income(date: dict):
     info = TaxInfo()
     result = 0
-    for row in map(lambda x: x.income_value, info.findByDate({"year": year})):
+    for row in map(lambda x: x.income_value, info.find_by_date(date)):
         result += row
-    print(f"The annual income for {year}'s year is {result}")
+    return result
+
+
+def find_month_income():
+    current_year = datetime.now().year
+    current_month = datetime.now().month
+    year = int(input(f"Enter the desired year (def {current_year})\n" or current_year))
+    month = int(input(f"Enter the desired month def {current_month}\n" or current_month))
+    result = count_income({"year": year, "month": month})
+    print(f"The annual income for {month}.{year}'s month is {result}")
 
 
 @repeat_on_invalid_input
@@ -33,7 +51,7 @@ def moth_tax_value():
     month = int(input("Enter the desired month \n"))
     info = TaxInfo()
     result = 0
-    for income in map(converted_income(), info.findByDate({"year": year, "month": month})):
+    for income in map(converted_income(), info.find_by_date({"year": year, "month": month})):
         result += income
     print(f"For  {month}.{year} you should pay {round_up(result * 0.01)}")
 
