@@ -3,8 +3,6 @@ from datetime import datetime
 import centrobank
 from tax_info import NewTaxRow, TaxInfo
 
-path = "source.txt"
-
 
 def import_txt(source_file_path):
     try:
