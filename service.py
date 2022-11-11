@@ -40,3 +40,12 @@ def moth_tax_value():
 
 def converted_income():
     return lambda x: x.income_value * x.exchange_rate
+
+
+def import_data():
+    try:
+        source_file_path = input(f"Enter the source file path (def {DEFAULT_SOURCE_PATH}\n) " or DEFAULT_SOURCE_PATH)
+        data_import.import_txt(source_file_path)
+    except FileNotFoundError:
+        if input("File by path {source_file_path} not found. Would you like to try again? Y/N \n") == 'Y':
+            import_data()
