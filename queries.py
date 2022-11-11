@@ -22,3 +22,8 @@ FIND_TAX_ROW_BY_DATE = '''SELECT * FROM tax_info
                 where strftime('%Y', incoming_date) = coalesce(?, strftime('%Y', incoming_date))
                 and strftime('%m', incoming_date) = coalesce(?, strftime('%m', incoming_date))
                 and strftime('%d', incoming_date) = coalesce(?, strftime('%d', incoming_date))'''
+
+FIND_TAX_ROW_BY_DATE_AND_INC_VALUE = '''SELECT * FROM tax_info
+WHERE incoming_date = ?
+AND income_value = ?
+'''
