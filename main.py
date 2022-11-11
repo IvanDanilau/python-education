@@ -11,7 +11,9 @@ def menu_description():
 *****************************     
     We have next commands:
  - 'add inc' - add income information
+ - 'imp data' - import tax data from txt file 
  - 'annual inc' - get annual income
+ - 'month inc' - get month income
  - 'month tax' - get month tax value
  - 'exit' - exit the program
 *****************************
@@ -19,12 +21,6 @@ def menu_description():
 
 
 if __name__ == '__main__':
-    # storage = TaxInfo("taxes.db")
-    # tax_row = TaxRow(1233, datetime(2022, 11, 12), 2.4347)
-    # storage.insert_row(tax_row)
-    # date = datetime.strptime('2022 10 1', '%Y %m %d')
-    # storage.findByDate(date)
-    # storage.findAll()
     print(" Greetings!")
     while True:
         val = input(menu_description()).replace(" ", "").lower()
@@ -34,12 +30,16 @@ if __name__ == '__main__':
         if val == 'annualinc':
             service.find_annual_income()
             continue
+        if val == 'monthinc':
+            service.find_month_income()
+            continue
         if val == 'monthtax':
             service.moth_tax_value()
             continue
         if val == "addinc":
             service.add_income()
+        if val == "impdata":
+            service.import_data()
+            continue
         else:
             print("Unrecognized command. Try again")
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
