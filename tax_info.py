@@ -58,13 +58,19 @@ class TaxInfo:
         return cursor.execute(FIND_TAX_ROW_BY_DATE, (year, month, day)).fetchall()
 
     @transaction
-    def insert_row(self, cursor, value: TaxRow):
-        cursor.row_factory = tax_info_factory()
-        return cursor.execute(ADD_TAX_INFO_ROW, value.toTuple()).fetchone()
+    def insert_row(self, cursor, value: NewTaxRow) -> TaxRow:
+        existed = self.find_existed(cursor, value)
+        if not existed:
+            cursor.row_factory = tax_info_factory()
+            return cursor.execute(ADD_TAX_INFO_ROW, value.to_tuple()).fetchone()
+        else:
+            print("income info already exists, returning existed")
+            return existed
 
-    @transaction
-    def clear_data(self, cursor):
-        cursor.execute(DELETE_ALL_TAX_INFO_ROWS)
+    def find_existed(self, cursor, value):
+        cursor.row_factory = tax_info_factory()
+        return cursor.execute(FIND_TAX_ROW_BY_DATE_AND_INC_VALUE, (value.income_date, value.income_value)) \
+            .fetchone()
 
     def __del__(self):
         self.connection.close()
