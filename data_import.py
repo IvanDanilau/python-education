@@ -13,6 +13,8 @@ def import_txt(source_file_path):
             new_rows = []
             invalid_rows = 0
             for row in source.readlines():
+                if not row.strip():
+                    continue
                 new_row = __map_to_nex_tax_row(date_inc_idx, inc_val_idx, row)
                 if new_row is None:
                     invalid_rows += 1
@@ -36,5 +38,5 @@ def __map_to_nex_tax_row(date_inc_idx, inc_val_idx, row):
         exchange_rate = centrobank.get_exchange_rate(date_income)
         return NewTaxRow(income_value, date_income, exchange_rate)
     except ValueError:
-        print(f"Invalid row data: '{row}'")
+        print(f"Invalid row data: '{row}' \n")
         return None

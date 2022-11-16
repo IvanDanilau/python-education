@@ -21,28 +21,43 @@ def add_income():
     print(f"Tax info added: \n {row}")
 
 
+@repeat_on_invalid_input
 def find_annual_income():
     current_year = datetime.now().year
     year = int(input(f"Enter the desired year (def {current_year})\n") or current_year)
-    result = count_income({"year": year})
+    result = income({"year": year})
     print(f"The annual income for {year}'s year is {result}")
 
 
-def count_income(date: dict):
+def income(period):
+    currency = input(f"Would you like get income in GEL or USD (def USD)\n") or "USD"
+    return source_income(period) if currency == 'USD' else converted_income(period)
+
+
+def source_income(date: dict):
     info = TaxInfo()
     result = 0
-    for row in map(lambda x: x.income_value, info.find_by_date(date)):
+    for row in map(lambda x: x.converted_income_value, info.find_by_date(date)):
         result += row
     return result
 
 
+def converted_income(date: dict):
+    info = TaxInfo()
+    result = 0
+    for row in map(lambda x: x.converted_income_value, info.find_by_date(date)):
+        result += row
+    return result
+
+
+@repeat_on_invalid_input
 def find_month_income():
     current_year = datetime.now().year
     current_month = datetime.now().month
     year = int(input(f"Enter the desired year (def {current_year})\n" or current_year))
     month = int(input(f"Enter the desired month def {current_month}\n" or current_month))
-    result = count_income({"year": year, "month": month})
-    print(f"The annual income for {month}.{year}'s month is {result}")
+    result = income({"year": year, "month": month})
+    print(f"The month income for {month}.{year}'s month is {result}")
 
 
 @repeat_on_invalid_input
@@ -62,7 +77,7 @@ def converted_income():
 
 def import_data():
     try:
-        source_file_path = input(f"Enter the source file path (def {DEFAULT_SOURCE_PATH}\n) " or DEFAULT_SOURCE_PATH)
+        source_file_path = input(f"Enter the source file path (def {DEFAULT_SOURCE_PATH}) \n") or DEFAULT_SOURCE_PATH
         data_import.import_txt(source_file_path)
     except FileNotFoundError:
         if input("File by path {source_file_path} not found. Would you like to try again? Y/N \n") == 'Y':
