@@ -1,7 +1,7 @@
 from datetime import datetime
 
-import centrobank
-from tax_info import NewTaxRow, TaxInfo
+from app.service import centrobank
+from app.database.tax_info import NewTaxRow, IncomeData
 
 
 def import_txt(source_file_path):
@@ -21,7 +21,7 @@ def import_txt(source_file_path):
                 else:
                     new_rows.append(new_row)
             if len(new_rows):
-                info = TaxInfo()
+                info = IncomeData()
                 for row in new_rows:
                     info.insert_row(row)
             print(f"Valid rows count {len(new_rows)} imported")

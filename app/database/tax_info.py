@@ -1,7 +1,10 @@
 import datetime
+import json
 import sqlite3
 
-from queries import *
+import pandas
+
+from app.database.queries import *
 from utils import *
 
 
@@ -37,12 +40,15 @@ class TaxRow:
     - income value in GEL {self.converted_income_value} \n
                """
 
+    def to_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
 
 def tax_info_factory():
     return lambda cursor, row: TaxRow(row[0], row[1], row[2], row[3], row[4])
 
 
-class TaxInfo:
+class IncomeData:
 
     def __init__(self):
         self.connection = sqlite3.connect(DATABASE_NAME)
@@ -54,16 +60,17 @@ class TaxInfo:
 
     @transaction
     def find_all(self, cursor):
-        for row in cursor.execute(FIND_ALL_TAX_INFO):
-            print(row)
+        cursor.row_factory = tax_info_factory()
+        response = pandas.read_sql_query(FIND_ALL_TAX_INFO, self.connection)
+        result = list()
+        for row in map(lambda row: TaxRow(row[0], row[1], row[2], row[3], row[4]), response.values.tolist()):
+            result.append(row)
+        return result
 
     @transaction
-    def find_by_date(self, cursor, date: dict):
-        year = None if date.get("year") is None else str(date.get('year'))
-        month = None if date.get("month") is None else str(date.get('month'))
-        day = None if date.get("day") is None else str(date.get('day'))
+    def find_by_dates(self, cursor, from_date, to_date):
         cursor.row_factory = tax_info_factory()
-        return cursor.execute(FIND_TAX_ROW_BY_DATE, (year, month, day)).fetchall()
+        return cursor.execute(FIND_INCOME_DATA_BETWEEN_DATES, (from_date, to_date)).fetchall()
 
     @transaction
     def insert_row(self, cursor, value: NewTaxRow) -> TaxRow:
